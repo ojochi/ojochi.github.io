@@ -1,39 +1,84 @@
----
+﻿---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))];
 ---
+
 <BaseLayout title="Blog">
   <h1 class="reveal">Blog</h1>
+
   <div class="card reveal controls">
-    <input id="search" placeholder="検索..." />
-    <select id="tag"><option value="">すべてのタグ</option>{tags.map((tag) => <option value={tag}>{tag}</option>)}</select>
+    <input id="search" type="search" placeholder="記事タイトルで検索" aria-label="記事検索" />
+    <select id="tag" aria-label="タグ絞り込み">
+      <option value="">すべてのタグ</option>
+      {tags.map((tag) => <option value={tag}>{tag}</option>)}
+    </select>
   </div>
-  <div class="grid" id="posts">
+
+  <div id="posts" class="grid">
     {posts.map((post) => (
-      <article class="card reveal" data-tags={post.data.tags.join(',')} data-title={post.data.title}>
+      <article class="card reveal" data-tags={post.data.tags.join(',')} data-title={post.data.title.toLowerCase()}>
         <h2><a href={`/blog/${post.slug}`}>{post.data.title}</a></h2>
+        <small>{post.data.pubDate.toLocaleDateString('ja-JP')}</small>
         <p>{post.data.description}</p>
       </article>
     ))}
   </div>
 </BaseLayout>
+
 <script is:inline>
   const search = document.getElementById('search');
   const tag = document.getElementById('tag');
   const cards = [...document.querySelectorAll('#posts article')];
-  function filter() {
-    const q = (search.value || '').toLowerCase();
-    const t = tag.value;
+
+  function applyFilter() {
+    const q = (search?.value || '').toLowerCase().trim();
+    const t = tag?.value || '';
+
     cards.forEach((card) => {
-      const okQ = card.dataset.title.toLowerCase().includes(q);
-      const okT = !t || card.dataset.tags.split(',').includes(t);
-      card.style.display = okQ && okT ? 'block' : 'none';
+      const title = card.dataset.title || '';
+      const tags = (card.dataset.tags || '').split(',').filter(Boolean);
+      const okTitle = title.includes(q);
+      const okTag = !t || tags.includes(t);
+      card.style.display = okTitle && okTag ? 'block' : 'none';
     });
   }
-  search?.addEventListener('input', filter);
-  tag?.addEventListener('change', filter);
+
+  search?.addEventListener('input', applyFilter);
+  tag?.addEventListener('change', applyFilter);
 </script>
-<style>.controls{display:grid;gap:.75rem;margin-bottom:1rem;}input,select{padding:.6rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-soft);color:var(--text);}</style>
+
+<style>
+  .controls {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  input,
+  select {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--surface), transparent 7%);
+    color: var(--text);
+    padding: 0.6rem 0.7rem;
+  }
+
+  h2 {
+    margin: 0;
+  }
+
+  small,
+  p {
+    color: var(--muted);
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+  }
+</style>

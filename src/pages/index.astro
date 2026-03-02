@@ -1,4 +1,4 @@
----
+﻿---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
@@ -7,36 +7,144 @@ import { fetchNotes } from '../lib/notes';
 const blogs = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
-const news = (await getCollection('news')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
+
+const newsList = (await getCollection('news')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const latestNews = newsList[0];
+const workFiles = import.meta.glob('/src/content/works/*.md');
+const works = Object.keys(workFiles).length > 0
+  ? await getCollection('works')
+  : [];
 const notes = await fetchNotes();
+const latestNote = notes[0];
 ---
+
 <BaseLayout title="Home">
-  <section>
-    <h1 class="reveal">ojochiの作業部屋</h1>
-    <p class="reveal">夜に目に優しい、ゆったりした制作ログサイト。</p>
+  <section class="hero reveal">
+    <p class="eyebrow">Personal site</p>
+    <h1>ojochiの作業部屋</h1>
+    <p>
+      開発メモ、制作の進捗、アップデートを静かに積み上げる場所です。
+    </p>
   </section>
 
-  <div class="section-title reveal"><h2>Latest Blog</h2><a href="/blog">一覧へ</a></div>
+  <div class="section-title reveal">
+    <h2>Latest Blog</h2>
+    <a href="/blog">一覧へ</a>
+  </div>
   <section class="grid cols-3">
     {blogs.map((post) => (
-      <Card title={post.data.title} description={post.data.description} href={`/blog/${post.slug}`} meta={post.data.pubDate.toLocaleDateString('ja-JP')} />
+      <Card
+        title={post.data.title}
+        description={post.data.description}
+        href={`/blog/${post.slug}`}
+        meta={post.data.pubDate.toLocaleDateString('ja-JP')}
+      />
     ))}
   </section>
 
-  <div class="section-title reveal"><h2>Latest News</h2><a href="/news">一覧へ</a></div>
-  <section>{news ? <Card title={news.data.title} description={news.data.description} meta={news.data.pubDate.toLocaleDateString('ja-JP')} /> : <Card title="準備中" />}</section>
+  <div class="section-title reveal">
+    <h2>Latest News</h2>
+    <a href="/news">一覧へ</a>
+  </div>
+  <section>
+    {latestNews ? (
+      <Card
+        title={latestNews.data.title}
+        description={latestNews.data.description}
+        meta={latestNews.data.pubDate.toLocaleDateString('ja-JP')}
+      />
+    ) : (
+      <Card title="更新準備中" description="最初のニュースを準備しています。" />
+    )}
+  </section>
 
-  <div class="section-title reveal"><h2>Note 最新</h2><a href="/note">一覧へ</a></div>
-  <section>{notes[0] ? <Card title={notes[0].title} description={notes[0].description} href={notes[0].link} meta={new Date(notes[0].pubDate).toLocaleDateString('ja-JP')} /> : <Card title="note準備中" description="RSS取得後に表示されます" />}</section>
+  <div class="section-title reveal">
+    <h2>Latest Note</h2>
+    <a href="/note">一覧へ</a>
+  </div>
+  <section>
+    {latestNote ? (
+      <Card
+        title={latestNote.title}
+        description={latestNote.description}
+        href={latestNote.link}
+        meta={new Date(latestNote.pubDate).toLocaleDateString('ja-JP')}
+      />
+    ) : (
+      <Card title="note準備中" description="RSS取得後に最新noteを表示します。" />
+    )}
+  </section>
 
-  <div class="section-title reveal"><h2>Works</h2><a href="/works">一覧へ</a></div>
-  <section><Card title="Coming soon" description="作品が追加されるとここに表示されます。" /></section>
+  <div class="section-title reveal">
+    <h2>Works</h2>
+    <a href="/works">一覧へ</a>
+  </div>
+  <section>
+    {works.length === 0 ? (
+      <Card
+        title="Coming soon"
+        description="作品を追加するとこの欄に自動で最新作品が表示されます。"
+      />
+    ) : (
+      <Card
+        title={works[0].data.title}
+        description={works[0].data.description}
+        href={works[0].data.link}
+        meta={works[0].data.pubDate.toLocaleDateString('ja-JP')}
+      />
+    )}
+  </section>
 
-  <div class="section-title reveal"><h2>SNS</h2></div>
-  <section class="card reveal sns">
-    <a href="https://x.com" target="_blank" rel="noreferrer">𝕏</a>
+  <div class="section-title reveal">
+    <h2>SNS</h2>
+  </div>
+  <section class="card reveal social-grid">
+    <a href="https://x.com/ojochi" target="_blank" rel="noreferrer">X</a>
     <a href="https://github.com/ojochi" target="_blank" rel="noreferrer">GitHub</a>
-    <a href="https://note.com" target="_blank" rel="noreferrer">note</a>
+    <a href="https://note.com/ojochi" target="_blank" rel="noreferrer">note</a>
   </section>
 </BaseLayout>
-<style>.sns{display:flex;gap:1rem;}</style>
+
+<style>
+  .hero {
+    background: color-mix(in srgb, var(--surface), transparent 2%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.4rem;
+  }
+
+  .hero h1 {
+    margin: 0.15rem 0 0.3rem;
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+  }
+
+  .hero p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .eyebrow {
+    color: var(--accent-2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+  }
+
+  .social-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .social-grid a {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    color: var(--text);
+    background: color-mix(in srgb, var(--surface-2), transparent 14%);
+  }
+</style>

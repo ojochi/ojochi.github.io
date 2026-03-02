@@ -1,21 +1,45 @@
----
+﻿---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const works = (await getCollection('works')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const workFiles = import.meta.glob('/src/content/works/*.md');
+const works = Object.keys(workFiles).length > 0
+  ? (await getCollection('works')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  : [];
 ---
+
 <BaseLayout title="Works">
   <h1 class="reveal">Works</h1>
+
   {works.length === 0 ? (
-    <section class="card reveal"><h2>Coming soon</h2><p>まだ作品はありません。追加されたら自動で一覧表示されます。</p></section>
+    <section class="card reveal">
+      <h2>Coming soon</h2>
+      <p>作品を追加すると自動で一覧表示に切り替わります。</p>
+    </section>
   ) : (
     <section class="grid cols-2">
       {works.map((work) => (
         <article class="card reveal">
           <h2>{work.data.link ? <a href={work.data.link}>{work.data.title}</a> : work.data.title}</h2>
+          <small>{work.data.pubDate.toLocaleDateString('ja-JP')}</small>
           <p>{work.data.description}</p>
         </article>
       ))}
     </section>
   )}
 </BaseLayout>
+
+<style>
+  h2 {
+    margin: 0;
+  }
+
+  small,
+  p {
+    color: var(--muted);
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+  }
+</style>

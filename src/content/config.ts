@@ -1,4 +1,4 @@
-import { defineCollection, z } from 'astro:content';
+﻿import { defineCollection, z } from 'astro:content';
 
 const blog = defineCollection({
   type: 'content',
@@ -8,8 +8,8 @@ const blog = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false)
-  })
+    draft: z.boolean().default(false),
+  }),
 });
 
 const news = defineCollection({
@@ -17,8 +17,8 @@ const news = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    pubDate: z.coerce.date()
-  })
+    pubDate: z.coerce.date(),
+  }),
 });
 
 const works = defineCollection({
@@ -28,8 +28,8 @@ const works = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     link: z.string().url().optional(),
-    tags: z.array(z.string()).default([])
-  })
+    tags: z.array(z.string()).default([]),
+  }),
 });
 
 export const collections = { blog, news, works };

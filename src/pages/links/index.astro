@@ -1,11 +1,37 @@
----
+﻿---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const links = [
+  { label: 'X', href: 'https://x.com/ojochi', desc: '日々の投稿とお知らせ' },
+  { label: 'GitHub', href: 'https://github.com/ojochi', desc: 'コードと制作物' },
+  { label: 'note', href: 'https://note.com/ojochi', desc: '記事と記録' },
+];
 ---
+
 <BaseLayout title="Links">
   <h1 class="reveal">Links</h1>
+
   <section class="grid cols-2">
-    <a class="card reveal" href="https://x.com" target="_blank" rel="noreferrer">X</a>
-    <a class="card reveal" href="https://github.com/ojochi" target="_blank" rel="noreferrer">GitHub</a>
-    <a class="card reveal" href="https://note.com/ojochi" target="_blank" rel="noreferrer">note</a>
+    {links.map((link) => (
+      <a class="card reveal link-card" href={link.href} target="_blank" rel="noreferrer">
+        <h2>{link.label}</h2>
+        <p>{link.desc}</p>
+      </a>
+    ))}
   </section>
 </BaseLayout>
+
+<style>
+  .link-card {
+    color: var(--text);
+  }
+
+  h2 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0.3rem 0 0;
+    color: var(--muted);
+  }
+</style>

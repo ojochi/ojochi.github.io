@@ -1,19 +1,57 @@
----
+﻿---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
 }
 
 const { post } = Astro.props;
 const { Content } = await post.render();
 ---
+
 <BaseLayout title={post.data.title}>
-  <article class="card reveal">
+  <article class="card reveal post-body">
     <h1>{post.data.title}</h1>
-    <p>{post.data.pubDate.toLocaleDateString('ja-JP')}</p>
+    <p class="meta">{post.data.pubDate.toLocaleDateString('ja-JP')}</p>
+    <div class="tags">
+      {post.data.tags.map((tag) => <span>{tag}</span>)}
+    </div>
     <Content />
   </article>
 </BaseLayout>
+
+<style>
+  .post-body {
+    padding: 1.4rem;
+  }
+
+  h1 {
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .meta {
+    margin-top: 0.35rem;
+    color: var(--muted);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+  }
+
+  .tags span {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.12rem 0.55rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+</style>

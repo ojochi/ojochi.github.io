@@ -1,19 +1,35 @@
----
+﻿---
 interface Props {
   title: string;
   description?: string;
   href?: string;
   meta?: string;
 }
+
 const { title, description, href, meta } = Astro.props;
 ---
+
 <article class="card reveal">
   <h3>{href ? <a href={href}>{title}</a> : title}</h3>
   {meta && <small>{meta}</small>}
   {description && <p>{description}</p>}
 </article>
+
 <style>
-  h3 { margin: 0 0 .5rem; }
-  p { margin: .5rem 0 0; color: var(--muted); }
-  small { color: var(--muted); }
+  h3 {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--muted);
+  }
+
+  p {
+    margin: 0.55rem 0 0;
+    color: var(--muted);
+    line-height: 1.65;
+  }
 </style>
