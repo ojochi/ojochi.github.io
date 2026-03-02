@@ -1,29 +1,29 @@
-# ojochi.github.io
+﻿# ojochi.github.io
 
-Astro製の個人サイト「ojochiの作業部屋」。
+Astroで構築した個人サイト「ojochiの作業部屋」です。
 
-## ローカル起動
+## セットアップ
 
 ```bash
 npm install
 npm run dev
 ```
 
-## 記事追加
+## コンテンツ管理
+
+Astro Content Collections + Markdownを利用しています。
 
 - Blog: `src/content/blog/*.md`
 - News: `src/content/news/*.md`
 - Works: `src/content/works/*.md`
 
-フロントマターは `src/content/config.ts` のschemaに従ってください。
+スキーマ定義: `src/content/config.ts`
 
-## NOTE_RSS_URL の設定
+## note RSS 設定
 
-`src/site.config.ts` の `NOTE_RSS_URL` を任意のRSS URLへ差し替えます。
-`/note` ページはビルド時にRSSを取得し、失敗時は「note準備中」を表示します。
+`src/site.config.ts` の `SITE.NOTE_RSS_URL` を差し替えると `/note` の取得先を変更できます。
+`/note` はビルド時にRSSを取得し、失敗時は「note準備中」を表示します。
 
-## デプロイ（GitHub Pages）
+## デプロイ
 
-- `main` ブランチへのpushで `.github/workflows/deploy.yml` が実行されます。
-- `astro.config.mjs` の `site` は `https://ojochi.github.io` を指定済み（ユーザーサイトのためbaseは`/`）。
-- 必要に応じてGitHubリポジトリ設定の Pages ソースを **GitHub Actions** にしてください。
+GitHub Actions (`.github/workflows/deploy.yml`) でGitHub Pagesへデプロイします。

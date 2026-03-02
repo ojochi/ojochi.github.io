@@ -1,13 +1,18 @@
----
+﻿---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { fetchNotes } from '../../lib/notes';
 
 const notes = await fetchNotes();
 ---
+
 <BaseLayout title="Note">
   <h1 class="reveal">Note</h1>
+
   {notes.length === 0 ? (
-    <section class="card reveal"><h2>note準備中</h2><p>RSSの取得が完了すると一覧が表示されます。</p></section>
+    <section class="card reveal">
+      <h2>note準備中</h2>
+      <p>RSSの取得に失敗したため、しばらくしてから再読み込みしてください。</p>
+    </section>
   ) : (
     <section class="grid cols-2">
       {notes.map((note) => (
@@ -20,3 +25,19 @@ const notes = await fetchNotes();
     </section>
   )}
 </BaseLayout>
+
+<style>
+  h2 {
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  small,
+  p {
+    color: var(--muted);
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+  }
+</style>

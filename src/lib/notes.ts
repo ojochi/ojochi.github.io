@@ -1,4 +1,4 @@
-import { XMLParser } from 'fast-xml-parser';
+﻿import { XMLParser } from 'fast-xml-parser';
 import { SITE } from '../site.config';
 
 export type NoteItem = {
@@ -10,12 +10,19 @@ export type NoteItem = {
 
 const parser = new XMLParser({
   ignoreAttributes: false,
-  trimValues: true
+  trimValues: true,
 });
+
+function sanitizeSummary(html: string) {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 110);
+}
 
 export async function fetchNotes(): Promise<NoteItem[]> {
   try {
-    const response = await fetch(SITE.NOTE_RSS_URL);
+    const response = await fetch(SITE.NOTE_RSS_URL, {
+      headers: { 'User-Agent': 'astro-note-fetcher' },
+    });
+
     if (!response.ok) {
       throw new Error(`RSS fetch failed: ${response.status}`);
     }
@@ -23,14 +30,16 @@ export async function fetchNotes(): Promise<NoteItem[]> {
     const xml = await response.text();
     const parsed = parser.parse(xml);
     const items = parsed?.rss?.channel?.item;
-    if (!items) return [];
+    if (!items) {
+      return [];
+    }
 
     const normalized = Array.isArray(items) ? items : [items];
-    return normalized.slice(0, 12).map((item) => ({
+    return normalized.slice(0, 12).map((item: Record<string, string>) => ({
       title: item.title ?? 'untitled',
       link: item.link ?? '#',
       pubDate: item.pubDate ?? '',
-      description: (item.description ?? '').replace(/<[^>]+>/g, '').slice(0, 120)
+      description: sanitizeSummary(item.description ?? ''),
     }));
   } catch {
     return [];

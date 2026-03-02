@@ -1,50 +1,63 @@
-<canvas id="rain-overlay" aria-hidden="true"></canvas>
+﻿<canvas id="rain-overlay" aria-hidden="true"></canvas>
+
 <script is:inline>
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!reduced) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reducedMotion) {
     const canvas = document.getElementById('rain-overlay');
-    const ctx = canvas?.getContext('2d');
-    const drops = [];
-    const maxDrops = 42;
+    const ctx = canvas?.getContext('2d', { alpha: true });
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    function spawn() {
-      while (drops.length < maxDrops) {
-        drops.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          l: 4 + Math.random() * 6,
-          v: 0.6 + Math.random() * 1.2,
-          o: 0.15 + Math.random() * 0.2
-        });
-      }
-    }
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const d of drops) {
-        ctx.strokeStyle = `rgba(180,190,220,${d.o})`;
-        ctx.beginPath();
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(d.x + 0.7, d.y + d.l);
-        ctx.stroke();
-        d.y += d.v;
-        if (d.y > canvas.height + 5) {
-          d.y = -10;
-          d.x = Math.random() * canvas.width;
+    if (canvas && ctx) {
+      const drops = [];
+      const maxDrops = 36;
+      let rafId;
+
+      const resize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+
+      const spawn = () => {
+        while (drops.length < maxDrops) {
+          drops.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            len: 4 + Math.random() * 6,
+            speed: 0.45 + Math.random() * 0.95,
+            alpha: 0.12 + Math.random() * 0.16,
+          });
         }
-      }
-      requestAnimationFrame(draw);
-    }
+      };
 
-    resize();
-    spawn();
-    draw();
-    window.addEventListener('resize', resize);
+      const frame = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (const d of drops) {
+          ctx.strokeStyle = `rgba(164,178,206,${d.alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(d.x, d.y);
+          ctx.lineTo(d.x + 0.8, d.y + d.len);
+          ctx.stroke();
+
+          d.y += d.speed;
+          if (d.y > canvas.height + 8) {
+            d.y = -12;
+            d.x = Math.random() * canvas.width;
+          }
+        }
+
+        rafId = window.requestAnimationFrame(frame);
+      };
+
+      resize();
+      spawn();
+      frame();
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('pagehide', () => window.cancelAnimationFrame(rafId), { once: true });
+    }
   }
 </script>
+
 <style>
   #rain-overlay {
     position: fixed;

@@ -1,36 +1,60 @@
----
-const links = [
+﻿---
+const navItems = [
   ['/', 'Home'],
   ['/blog', 'Blog'],
   ['/works', 'Works'],
   ['/news', 'News'],
   ['/note', 'Note'],
-  ['/links', 'Links']
-];
+  ['/links', 'Links'],
+] as const;
+
+const socialItems = [
+  ['https://x.com/ojochi', 'X'],
+  ['https://github.com/ojochi', 'GH'],
+  ['https://note.com/ojochi', 'Nt'],
+] as const;
 ---
+
 <header class="site-header">
-  <div class="container wrap">
+  <div class="container header-wrap">
     <a href="/" class="logo">ojochiの作業部屋</a>
-    <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
-    <nav id="site-nav" class="nav" data-open="false">
-      {links.map(([href, label]) => <a href={href}>{label}</a>)}
-      <button id="theme-toggle" class="theme-toggle" aria-label="テーマ切替">🌓</button>
+
+    <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="site-nav">
+      Menu
+    </button>
+
+    <nav id="site-nav" class="site-nav" data-open="false">
+      <div class="nav-links">
+        {navItems.map(([href, label]) => <a href={href}>{label}</a>)}
+      </div>
+      <div class="nav-tools">
+        <div class="social" aria-label="SNS links">
+          {socialItems.map(([href, label]) => (
+            <a href={href} target="_blank" rel="noreferrer" aria-label={label}>{label}</a>
+          ))}
+        </div>
+        <button id="theme-toggle" class="theme-toggle" aria-label="テーマ切り替え">Theme</button>
+      </div>
     </nav>
   </div>
 </header>
 
 <script is:inline>
-  const toggle = document.getElementById('menu-toggle');
+  const menuToggle = document.getElementById('menu-toggle');
   const nav = document.getElementById('site-nav');
-  toggle?.addEventListener('click', () => {
+
+  menuToggle?.addEventListener('click', () => {
     const open = nav?.dataset.open === 'true';
+    if (!nav) return;
     nav.dataset.open = String(!open);
-    toggle.setAttribute('aria-expanded', String(!open));
+    menuToggle.setAttribute('aria-expanded', String(!open));
   });
 
   const root = document.documentElement;
-  const storedTheme = localStorage.getItem('theme');
-  if (storedTheme) root.dataset.theme = storedTheme;
+  const stored = localStorage.getItem('theme');
+  if (stored === 'light' || stored === 'dark') {
+    root.dataset.theme = stored;
+  }
 
   document.getElementById('theme-toggle')?.addEventListener('click', () => {
     const next = root.dataset.theme === 'light' ? 'dark' : 'light';
@@ -40,18 +64,116 @@ const links = [
 </script>
 
 <style>
-  .site-header { position: sticky; top: 0; backdrop-filter: blur(12px); z-index: 20; background: color-mix(in srgb, var(--bg), transparent 25%); border-bottom: 1px solid var(--border); }
-  .wrap { display: flex; align-items: center; justify-content: space-between; padding: .9rem 0; gap: 1rem; }
-  .logo { color: var(--text); font-weight: 700; }
-  .menu-toggle { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 10px; padding: .35rem .65rem; }
-  .nav { position: absolute; top: 100%; left: 0; right: 0; transform-origin: top; transform: scaleY(0.98); opacity: 0; pointer-events: none; transition: transform 240ms ease, opacity 240ms ease; display: grid; gap: .5rem; padding: .75rem 4vw 1rem; background: var(--bg-soft); border-bottom: 1px solid var(--border); }
-  .nav[data-open='true'] { transform: scaleY(1); opacity: 1; pointer-events: auto; }
-  .nav a { color: var(--text); }
-  .theme-toggle { justify-self: start; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: .3rem .55rem; }
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg), transparent 22%);
+    backdrop-filter: blur(11px);
+  }
 
-  @media (min-width: 768px) {
-    .menu-toggle { display: none; }
-    .nav { position: static; opacity: 1; pointer-events: auto; transform: none; border: 0; background: transparent; display: flex; align-items: center; padding: 0; }
-    .theme-toggle { margin-left: .4rem; }
+  .header-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0.9rem 0;
+  }
+
+  .logo {
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .menu-toggle,
+  .theme-toggle {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text);
+    padding: 0.4rem 0.7rem;
+  }
+
+  .site-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: grid;
+    gap: 0.8rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 220ms ease, transform 220ms ease;
+    padding: 0.9rem 4vw 1.1rem;
+    background: color-mix(in srgb, var(--bg-soft), transparent 3%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .site-nav[data-open='true'] {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+
+  .nav-links a {
+    color: var(--text);
+  }
+
+  .nav-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  .social {
+    display: inline-flex;
+    gap: 0.5rem;
+  }
+
+  .social a {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-2), transparent 10%);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  @media (min-width: 900px) {
+    .menu-toggle {
+      display: none;
+    }
+
+    .site-nav {
+      position: static;
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+      border: 0;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0;
+    }
+
+    .nav-tools {
+      justify-content: flex-end;
+    }
   }
 </style>

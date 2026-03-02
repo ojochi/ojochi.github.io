@@ -1,11 +1,15 @@
----
+﻿---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const newsList = (await getCollection('news')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const newsList = (await getCollection('news')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
 ---
+
 <BaseLayout title="News">
   <h1 class="reveal">News</h1>
+
   <ol class="timeline">
     {newsList.map((item) => (
       <li class="card reveal">
@@ -16,4 +20,26 @@ const newsList = (await getCollection('news')).sort((a, b) => b.data.pubDate.val
     ))}
   </ol>
 </BaseLayout>
-<style>.timeline{list-style:none;padding:0;display:grid;gap:1rem;}time{color:var(--muted);}</style>
+
+<style>
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  time,
+  p {
+    color: var(--muted);
+  }
+
+  h2 {
+    margin: 0.3rem 0;
+  }
+
+  p {
+    margin: 0;
+  }
+</style>
