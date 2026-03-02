@@ -1,0 +1,55 @@
+<canvas id="rain-overlay" aria-hidden="true"></canvas>
+<script is:inline>
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduced) {
+    const canvas = document.getElementById('rain-overlay');
+    const ctx = canvas?.getContext('2d');
+    const drops = [];
+    const maxDrops = 42;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    function spawn() {
+      while (drops.length < maxDrops) {
+        drops.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          l: 4 + Math.random() * 6,
+          v: 0.6 + Math.random() * 1.2,
+          o: 0.15 + Math.random() * 0.2
+        });
+      }
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const d of drops) {
+        ctx.strokeStyle = `rgba(180,190,220,${d.o})`;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x + 0.7, d.y + d.l);
+        ctx.stroke();
+        d.y += d.v;
+        if (d.y > canvas.height + 5) {
+          d.y = -10;
+          d.x = Math.random() * canvas.width;
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    spawn();
+    draw();
+    window.addEventListener('resize', resize);
+  }
+</script>
+<style>
+  #rain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+</style>

@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const newsList = (await getCollection('news')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<BaseLayout title="News">
+  <h1 class="reveal">News</h1>
+  <ol class="timeline">
+    {newsList.map((item) => (
+      <li class="card reveal">
+        <time>{item.data.pubDate.toLocaleDateString('ja-JP')}</time>
+        <h2>{item.data.title}</h2>
+        <p>{item.data.description}</p>
+      </li>
+    ))}
+  </ol>
+</BaseLayout>
+<style>.timeline{list-style:none;padding:0;display:grid;gap:1rem;}time{color:var(--muted);}</style>

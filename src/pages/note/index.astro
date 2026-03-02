@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchNotes } from '../../lib/notes';
+
+const notes = await fetchNotes();
+---
+<BaseLayout title="Note">
+  <h1 class="reveal">Note</h1>
+  {notes.length === 0 ? (
+    <section class="card reveal"><h2>note準備中</h2><p>RSSの取得が完了すると一覧が表示されます。</p></section>
+  ) : (
+    <section class="grid cols-2">
+      {notes.map((note) => (
+        <article class="card reveal">
+          <h2><a href={note.link} target="_blank" rel="noreferrer">{note.title}</a></h2>
+          <small>{new Date(note.pubDate).toLocaleDateString('ja-JP')}</small>
+          <p>{note.description}</p>
+        </article>
+      ))}
+    </section>
+  )}
+</BaseLayout>

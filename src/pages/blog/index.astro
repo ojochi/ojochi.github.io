@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+---
+<BaseLayout title="Blog">
+  <h1 class="reveal">Blog</h1>
+  <div class="card reveal controls">
+    <input id="search" placeholder="検索..." />
+    <select id="tag"><option value="">すべてのタグ</option>{tags.map((tag) => <option value={tag}>{tag}</option>)}</select>
+  </div>
+  <div class="grid" id="posts">
+    {posts.map((post) => (
+      <article class="card reveal" data-tags={post.data.tags.join(',')} data-title={post.data.title}>
+        <h2><a href={`/blog/${post.slug}`}>{post.data.title}</a></h2>
+        <p>{post.data.description}</p>
+      </article>
+    ))}
+  </div>
+</BaseLayout>
+<script is:inline>
+  const search = document.getElementById('search');
+  const tag = document.getElementById('tag');
+  const cards = [...document.querySelectorAll('#posts article')];
+  function filter() {
+    const q = (search.value || '').toLowerCase();
+    const t = tag.value;
+    cards.forEach((card) => {
+      const okQ = card.dataset.title.toLowerCase().includes(q);
+      const okT = !t || card.dataset.tags.split(',').includes(t);
+      card.style.display = okQ && okT ? 'block' : 'none';
+    });
+  }
+  search?.addEventListener('input', filter);
+  tag?.addEventListener('change', filter);
+</script>
+<style>.controls{display:grid;gap:.75rem;margin-bottom:1rem;}input,select{padding:.6rem;border-radius:8px;border:1px solid var(--border);background:var(--bg-soft);color:var(--text);}</style>
