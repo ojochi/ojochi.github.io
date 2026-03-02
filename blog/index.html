@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="ja" data-theme="dark" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="ojochiの制作ログと更新情報をまとめる個人ホームページ。"><title>Blog | ojochiの作業部屋</title><link rel="stylesheet" href="/_astro/_slug_.BhAdOvud.css">
+<style>.controls[data-astro-cid-5tznm7mj]{display:grid;gap:.75rem;margin-bottom:1rem}input[data-astro-cid-5tznm7mj],select[data-astro-cid-5tznm7mj]{border:1px solid var(--border);border-radius:10px;background:color-mix(in srgb,var(--surface),transparent 7%);color:var(--text);padding:.6rem .7rem}h2[data-astro-cid-5tznm7mj]{margin:0}small[data-astro-cid-5tznm7mj],p[data-astro-cid-5tznm7mj]{color:var(--muted)}p[data-astro-cid-5tznm7mj]{margin:.4rem 0 0}
+</style></head> <body data-astro-cid-37fxchfa> <canvas id="rain-overlay" aria-hidden="true" data-astro-cid-lxvrriyt></canvas> <script>
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reducedMotion) {
+    const canvas = document.getElementById('rain-overlay');
+    const ctx = canvas?.getContext('2d', { alpha: true });
+
+    if (canvas && ctx) {
+      const drops = [];
+      const maxDrops = 36;
+      let rafId;
+
+      const resize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+
+      const spawn = () => {
+        while (drops.length < maxDrops) {
+          drops.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            len: 4 + Math.random() * 6,
+            speed: 0.45 + Math.random() * 0.95,
+            alpha: 0.12 + Math.random() * 0.16,
+          });
+        }
+      };
+
+      const frame = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (const d of drops) {
+          ctx.strokeStyle = `rgba(164,178,206,${d.alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(d.x, d.y);
+          ctx.lineTo(d.x + 0.8, d.y + d.len);
+          ctx.stroke();
+
+          d.y += d.speed;
+          if (d.y > canvas.height + 8) {
+            d.y = -12;
+            d.x = Math.random() * canvas.width;
+          }
+        }
+
+        rafId = window.requestAnimationFrame(frame);
+      };
+
+      resize();
+      spawn();
+      frame();
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('pagehide', () => window.cancelAnimationFrame(rafId), { once: true });
+    }
+  }
+</script>  <div class="shell" data-astro-cid-37fxchfa> <header class="site-header" data-astro-cid-3ef6ksr2> <div class="container header-wrap" data-astro-cid-3ef6ksr2> <a href="/" class="logo" data-astro-cid-3ef6ksr2>ojochiの作業部屋</a> <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="site-nav" data-astro-cid-3ef6ksr2>
+Menu
+</button> <nav id="site-nav" class="site-nav" data-open="false" data-astro-cid-3ef6ksr2> <div class="nav-links" data-astro-cid-3ef6ksr2> <a href="/" data-astro-cid-3ef6ksr2>Home</a><a href="/blog" data-astro-cid-3ef6ksr2>Blog</a><a href="/works" data-astro-cid-3ef6ksr2>Works</a><a href="/news" data-astro-cid-3ef6ksr2>News</a><a href="/note" data-astro-cid-3ef6ksr2>Note</a><a href="/links" data-astro-cid-3ef6ksr2>Links</a> </div> <div class="nav-tools" data-astro-cid-3ef6ksr2> <div class="social" aria-label="SNS links" data-astro-cid-3ef6ksr2> <a href="https://x.com/ojochi" target="_blank" rel="noreferrer" aria-label="X" data-astro-cid-3ef6ksr2>X</a><a href="https://github.com/ojochi" target="_blank" rel="noreferrer" aria-label="GH" data-astro-cid-3ef6ksr2>GH</a><a href="https://note.com/ojochi" target="_blank" rel="noreferrer" aria-label="Nt" data-astro-cid-3ef6ksr2>Nt</a> </div> <button id="theme-toggle" class="theme-toggle" aria-label="テーマ切り替え" data-astro-cid-3ef6ksr2>Theme</button> </div> </nav> </div> </header> <script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('site-nav');
+
+  menuToggle?.addEventListener('click', () => {
+    const open = nav?.dataset.open === 'true';
+    if (!nav) return;
+    nav.dataset.open = String(!open);
+    menuToggle.setAttribute('aria-expanded', String(!open));
+  });
+
+  const root = document.documentElement;
+  const stored = localStorage.getItem('theme');
+  if (stored === 'light' || stored === 'dark') {
+    root.dataset.theme = stored;
+  }
+
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+</script>  <main class="container page-main" data-astro-cid-37fxchfa>  <h1 class="reveal" data-astro-cid-5tznm7mj>Blog</h1> <div class="card reveal controls" data-astro-cid-5tznm7mj> <input id="search" type="search" placeholder="記事タイトルで検索" aria-label="記事検索" data-astro-cid-5tznm7mj> <select id="tag" aria-label="タグ絞り込み" data-astro-cid-5tznm7mj> <option value="" data-astro-cid-5tznm7mj>すべてのタグ</option> <option value="Astro" data-astro-cid-5tznm7mj>Astro</option><option value="開発ログ" data-astro-cid-5tznm7mj>開発ログ</option> </select> </div> <div id="posts" class="grid" data-astro-cid-5tznm7mj> <article class="card reveal" data-tags="Astro,開発ログ" data-title="サイトを作り直した記録" data-astro-cid-5tznm7mj> <h2 data-astro-cid-5tznm7mj><a href="/blog/welcome" data-astro-cid-5tznm7mj>サイトを作り直した記録</a></h2> <small data-astro-cid-5tznm7mj>2026/3/1</small> <p data-astro-cid-5tznm7mj>Astroで個人HPを再構築した最初のメモです。</p> </article> </div>  </main> <footer class="site-footer" data-astro-cid-sz7xmlte> <div class="container footer-inner" data-astro-cid-sz7xmlte> <p data-astro-cid-sz7xmlte>© 2026 ojochi</p> </div> </footer>  </div> <script>
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      } else {
+        document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+      }
+    </script> </body> </html>  <script>
+  const search = document.getElementById('search');
+  const tag = document.getElementById('tag');
+  const cards = [...document.querySelectorAll('#posts article')];
+
+  function applyFilter() {
+    const q = (search?.value || '').toLowerCase().trim();
+    const t = tag?.value || '';
+
+    cards.forEach((card) => {
+      const title = card.dataset.title || '';
+      const tags = (card.dataset.tags || '').split(',').filter(Boolean);
+      const okTitle = title.includes(q);
+      const okTag = !t || tags.includes(t);
+      card.style.display = okTitle && okTag ? 'block' : 'none';
+    });
+  }
+
+  search?.addEventListener('input', applyFilter);
+  tag?.addEventListener('change', applyFilter);
+</script> 
