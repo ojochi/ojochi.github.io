@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import RainOverlay from '../components/RainOverlay.astro';
+import SidebarNav from '../components/SidebarNav.astro';
 import { SITE } from '../site.config';
 
 interface Props {
@@ -19,14 +20,34 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={SITE.description} />
     <title>{title ? `${title} | ${SITE.name}` : SITE.name}</title>
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          if (stored === 'light' || stored === 'dark') {
+            document.documentElement.dataset.theme = stored;
+          }
+        } catch {
+          // noop
+        }
+      })();
+    </script>
   </head>
   <body>
     <RainOverlay />
     <div class="shell">
       <Header />
-      <main class="container page-main">
-        <slot />
-      </main>
+
+      <div class="container app-layout">
+        <aside id="sidebar-nav-panel" class="sidebar-panel" data-open="false">
+          <SidebarNav />
+        </aside>
+
+        <main class="page-main">
+          <slot />
+        </main>
+      </div>
+
       <Footer />
     </div>
 
@@ -53,9 +74,5 @@ const { title } = Astro.props;
   .shell {
     position: relative;
     z-index: 2;
-  }
-
-  .page-main {
-    padding: 1.2rem 0 2.4rem;
   }
 </style>

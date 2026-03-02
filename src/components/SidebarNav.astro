@@ -1,0 +1,98 @@
+﻿---
+const pathname = Astro.url.pathname;
+
+const navItems = [
+  ['/', 'Home'],
+  ['/news', 'News'],
+  ['/blog', 'Blog'],
+  ['/note', 'Note'],
+  ['/works', 'Works'],
+  ['/links', 'Links'],
+] as const;
+
+const socialItems = [
+  ['https://x.com/ojochi', 'X'],
+  ['https://github.com/ojochi', 'GitHub'],
+  ['https://note.com/ojochi', 'note'],
+] as const;
+
+const isActive = (href: string) => {
+  if (href === '/') return pathname === '/';
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
+---
+
+<nav class="sidebar card reveal" aria-label="主要メニュー">
+  <p class="group-label">Navigation</p>
+  <ul class="menu-list">
+    {navItems.map(([href, label]) => {
+      const active = isActive(href);
+      return (
+        <li>
+          <a href={href} class={active ? 'active' : ''} aria-current={active ? 'page' : undefined}>
+            {label}
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+
+  <p class="group-label sub">SNS</p>
+  <ul class="menu-list social-list">
+    {socialItems.map(([href, label]) => (
+      <li><a href={href} target="_blank" rel="noreferrer">{label}</a></li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .sidebar {
+    padding: 1rem;
+  }
+
+  .group-label {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .group-label.sub {
+    margin-top: 1.1rem;
+  }
+
+  .menu-list {
+    margin: 0.45rem 0 0;
+    padding-left: 1.15rem;
+    list-style: disc;
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .menu-list li::marker {
+    color: color-mix(in srgb, var(--accent), transparent 30%);
+  }
+
+  .menu-list a {
+    display: block;
+    color: var(--text);
+    border-radius: 10px;
+    padding: 0.35rem 0.55rem;
+    margin-left: -0.35rem;
+    border: 1px solid transparent;
+  }
+
+  .menu-list a:hover,
+  .menu-list a:focus-visible {
+    border-color: color-mix(in srgb, var(--accent), transparent 35%);
+    background: color-mix(in srgb, var(--surface-2), transparent 15%);
+  }
+
+  .menu-list a.active {
+    border-color: color-mix(in srgb, var(--accent), transparent 22%);
+    background: color-mix(in srgb, var(--accent), transparent 82%);
+    color: var(--text-strong);
+    font-weight: 600;
+  }
+</style>

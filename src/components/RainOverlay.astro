@@ -24,7 +24,7 @@
             y: Math.random() * canvas.height,
             len: 4 + Math.random() * 6,
             speed: 0.45 + Math.random() * 0.95,
-            alpha: 0.12 + Math.random() * 0.16,
+            alpha: 0.1 + Math.random() * 0.16,
           });
         }
       };
@@ -33,7 +33,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         for (const d of drops) {
-          ctx.strokeStyle = `rgba(164,178,206,${d.alpha})`;
+          ctx.strokeStyle = `rgba(154,173,147,${d.alpha})`;
           ctx.beginPath();
           ctx.moveTo(d.x, d.y);
           ctx.lineTo(d.x + 0.8, d.y + d.len);

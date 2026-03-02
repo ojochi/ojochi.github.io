@@ -8,26 +8,43 @@ const blogs = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 
-const newsList = (await getCollection('news')).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const latestNews = (await getCollection('news'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
 
-const latestNews = newsList[0];
 const workFiles = import.meta.glob('/src/content/works/*.md');
 const works = Object.keys(workFiles).length > 0
-  ? await getCollection('works')
+  ? (await getCollection('works')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   : [];
+
 const notes = await fetchNotes();
-const latestNote = notes[0];
+const latestNotes = notes.slice(0, 3);
 ---
 
 <BaseLayout title="Home">
   <section class="hero reveal">
     <p class="eyebrow">Personal site</p>
     <h1>ojochiの作業部屋</h1>
-    <p>
-      開発メモ、制作の進捗、アップデートを静かに積み上げる場所です。
-    </p>
+    <p>開発メモ、制作の進捗、アップデートを静かに積み上げる場所です。</p>
+  </section>
+
+  <div class="section-title reveal">
+    <h2>Latest News</h2>
+    <a href="/news">一覧へ</a>
+  </div>
+  <section class="grid cols-3">
+    {latestNews.length === 0 ? (
+      <Card title="更新準備中" description="最初のニュースを準備しています。" />
+    ) : (
+      latestNews.map((item) => (
+        <Card
+          title={item.data.title}
+          description={item.data.description}
+          href="/news"
+          meta={item.data.pubDate.toLocaleDateString('ja-JP')}
+        />
+      ))
+    )}
   </section>
 
   <div class="section-title reveal">
@@ -46,35 +63,21 @@ const latestNote = notes[0];
   </section>
 
   <div class="section-title reveal">
-    <h2>Latest News</h2>
-    <a href="/news">一覧へ</a>
-  </div>
-  <section>
-    {latestNews ? (
-      <Card
-        title={latestNews.data.title}
-        description={latestNews.data.description}
-        meta={latestNews.data.pubDate.toLocaleDateString('ja-JP')}
-      />
-    ) : (
-      <Card title="更新準備中" description="最初のニュースを準備しています。" />
-    )}
-  </section>
-
-  <div class="section-title reveal">
     <h2>Latest Note</h2>
     <a href="/note">一覧へ</a>
   </div>
-  <section>
-    {latestNote ? (
-      <Card
-        title={latestNote.title}
-        description={latestNote.description}
-        href={latestNote.link}
-        meta={new Date(latestNote.pubDate).toLocaleDateString('ja-JP')}
-      />
-    ) : (
+  <section class="grid cols-3">
+    {latestNotes.length === 0 ? (
       <Card title="note準備中" description="RSS取得後に最新noteを表示します。" />
+    ) : (
+      latestNotes.map((note) => (
+        <Card
+          title={note.title}
+          description={note.description}
+          href={note.link}
+          meta={new Date(note.pubDate).toLocaleDateString('ja-JP')}
+        />
+      ))
     )}
   </section>
 
@@ -84,10 +87,7 @@ const latestNote = notes[0];
   </div>
   <section>
     {works.length === 0 ? (
-      <Card
-        title="Coming soon"
-        description="作品を追加するとこの欄に自動で最新作品が表示されます。"
-      />
+      <Card title="Coming soon" description="作品を追加すると自動で一覧に切り替わります。" />
     ) : (
       <Card
         title={works[0].data.title}
@@ -97,15 +97,6 @@ const latestNote = notes[0];
       />
     )}
   </section>
-
-  <div class="section-title reveal">
-    <h2>SNS</h2>
-  </div>
-  <section class="card reveal social-grid">
-    <a href="https://x.com/ojochi" target="_blank" rel="noreferrer">X</a>
-    <a href="https://github.com/ojochi" target="_blank" rel="noreferrer">GitHub</a>
-    <a href="https://note.com/ojochi" target="_blank" rel="noreferrer">note</a>
-  </section>
 </BaseLayout>
 
 <style>
@@ -114,11 +105,12 @@ const latestNote = notes[0];
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 1.4rem;
+    padding: 1.35rem;
   }
 
   .hero h1 {
-    margin: 0.15rem 0 0.3rem;
+    margin: 0.14rem 0 0.35rem;
+    color: var(--text-strong);
     font-size: clamp(1.5rem, 4vw, 2.1rem);
   }
 
@@ -128,23 +120,9 @@ const latestNote = notes[0];
   }
 
   .eyebrow {
-    color: var(--accent-2);
+    color: var(--accent-strong);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    font-size: 0.78rem;
-  }
-
-  .social-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-  }
-
-  .social-grid a {
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 0.4rem 0.8rem;
-    color: var(--text);
-    background: color-mix(in srgb, var(--surface-2), transparent 14%);
+    font-size: 0.76rem;
   }
 </style>
