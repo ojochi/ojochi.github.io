@@ -17,7 +17,17 @@ const news = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    pubDate: z.coerce.date(),
+    date: z.coerce.date().optional(),
+    pubDate: z.coerce.date().optional(),
+    draft: z.boolean().default(false),
+  }).superRefine((data, ctx) => {
+    if (!data.date && !data.pubDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'date or pubDate is required',
+        path: ['date'],
+      });
+    }
   }),
 });
 

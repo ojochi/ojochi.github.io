@@ -3,14 +3,13 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import { fetchNotes } from '../lib/notes';
+import { getNewsDate, sortNews } from '../lib/news';
 
 const blogs = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 
-const latestNews = (await getCollection('news'))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+const latestNews = sortNews(await getCollection('news', ({ data }) => !data.draft)).slice(0, 3);
 
 const workFiles = import.meta.glob('/src/content/works/*.md');
 const works = Object.keys(workFiles).length > 0
@@ -41,7 +40,7 @@ const latestNotes = notes.slice(0, 3);
           title={item.data.title}
           description={item.data.description}
           href="/news"
-          meta={item.data.pubDate.toLocaleDateString('ja-JP')}
+          meta={getNewsDate(item).toLocaleDateString('ja-JP')}
         />
       ))
     )}
