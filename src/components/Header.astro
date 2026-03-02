@@ -1,0 +1,57 @@
+---
+const links = [
+  ['/', 'Home'],
+  ['/blog', 'Blog'],
+  ['/works', 'Works'],
+  ['/news', 'News'],
+  ['/note', 'Note'],
+  ['/links', 'Links']
+];
+---
+<header class="site-header">
+  <div class="container wrap">
+    <a href="/" class="logo">ojochiの作業部屋</a>
+    <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="nav" data-open="false">
+      {links.map(([href, label]) => <a href={href}>{label}</a>)}
+      <button id="theme-toggle" class="theme-toggle" aria-label="テーマ切替">🌓</button>
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  const toggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('site-nav');
+  toggle?.addEventListener('click', () => {
+    const open = nav?.dataset.open === 'true';
+    nav.dataset.open = String(!open);
+    toggle.setAttribute('aria-expanded', String(!open));
+  });
+
+  const root = document.documentElement;
+  const storedTheme = localStorage.getItem('theme');
+  if (storedTheme) root.dataset.theme = storedTheme;
+
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+</script>
+
+<style>
+  .site-header { position: sticky; top: 0; backdrop-filter: blur(12px); z-index: 20; background: color-mix(in srgb, var(--bg), transparent 25%); border-bottom: 1px solid var(--border); }
+  .wrap { display: flex; align-items: center; justify-content: space-between; padding: .9rem 0; gap: 1rem; }
+  .logo { color: var(--text); font-weight: 700; }
+  .menu-toggle { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 10px; padding: .35rem .65rem; }
+  .nav { position: absolute; top: 100%; left: 0; right: 0; transform-origin: top; transform: scaleY(0.98); opacity: 0; pointer-events: none; transition: transform 240ms ease, opacity 240ms ease; display: grid; gap: .5rem; padding: .75rem 4vw 1rem; background: var(--bg-soft); border-bottom: 1px solid var(--border); }
+  .nav[data-open='true'] { transform: scaleY(1); opacity: 1; pointer-events: auto; }
+  .nav a { color: var(--text); }
+  .theme-toggle { justify-self: start; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: .3rem .55rem; }
+
+  @media (min-width: 768px) {
+    .menu-toggle { display: none; }
+    .nav { position: static; opacity: 1; pointer-events: auto; transform: none; border: 0; background: transparent; display: flex; align-items: center; padding: 0; }
+    .theme-toggle { margin-left: .4rem; }
+  }
+</style>

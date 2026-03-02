@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import { fetchNotes } from '../lib/notes';
+
+const blogs = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+const news = (await getCollection('news')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
+const notes = await fetchNotes();
+---
+<BaseLayout title="Home">
+  <section>
+    <h1 class="reveal">ojochiの作業部屋</h1>
+    <p class="reveal">夜に目に優しい、ゆったりした制作ログサイト。</p>
+  </section>
+
+  <div class="section-title reveal"><h2>Latest Blog</h2><a href="/blog">一覧へ</a></div>
+  <section class="grid cols-3">
+    {blogs.map((post) => (
+      <Card title={post.data.title} description={post.data.description} href={`/blog/${post.slug}`} meta={post.data.pubDate.toLocaleDateString('ja-JP')} />
+    ))}
+  </section>
+
+  <div class="section-title reveal"><h2>Latest News</h2><a href="/news">一覧へ</a></div>
+  <section>{news ? <Card title={news.data.title} description={news.data.description} meta={news.data.pubDate.toLocaleDateString('ja-JP')} /> : <Card title="準備中" />}</section>
+
+  <div class="section-title reveal"><h2>Note 最新</h2><a href="/note">一覧へ</a></div>
+  <section>{notes[0] ? <Card title={notes[0].title} description={notes[0].description} href={notes[0].link} meta={new Date(notes[0].pubDate).toLocaleDateString('ja-JP')} /> : <Card title="note準備中" description="RSS取得後に表示されます" />}</section>
+
+  <div class="section-title reveal"><h2>Works</h2><a href="/works">一覧へ</a></div>
+  <section><Card title="Coming soon" description="作品が追加されるとここに表示されます。" /></section>
+
+  <div class="section-title reveal"><h2>SNS</h2></div>
+  <section class="card reveal sns">
+    <a href="https://x.com" target="_blank" rel="noreferrer">𝕏</a>
+    <a href="https://github.com/ojochi" target="_blank" rel="noreferrer">GitHub</a>
+    <a href="https://note.com" target="_blank" rel="noreferrer">note</a>
+  </section>
+</BaseLayout>
+<style>.sns{display:flex;gap:1rem;}</style>
