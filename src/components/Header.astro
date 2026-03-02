@@ -1,179 +1,102 @@
 ﻿---
-const navItems = [
-  ['/', 'Home'],
-  ['/blog', 'Blog'],
-  ['/works', 'Works'],
-  ['/news', 'News'],
-  ['/note', 'Note'],
-  ['/links', 'Links'],
-] as const;
-
-const socialItems = [
-  ['https://x.com/ojochi', 'X'],
-  ['https://github.com/ojochi', 'GH'],
-  ['https://note.com/ojochi', 'Nt'],
-] as const;
 ---
 
 <header class="site-header">
-  <div class="container header-wrap">
-    <a href="/" class="logo">ojochiの作業部屋</a>
+  <div class="container header-inner">
+    <a href="/" class="site-title">ojochiの作業部屋</a>
 
-    <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="site-nav">
-      Menu
-    </button>
-
-    <nav id="site-nav" class="site-nav" data-open="false">
-      <div class="nav-links">
-        {navItems.map(([href, label]) => <a href={href}>{label}</a>)}
-      </div>
-      <div class="nav-tools">
-        <div class="social" aria-label="SNS links">
-          {socialItems.map(([href, label]) => (
-            <a href={href} target="_blank" rel="noreferrer" aria-label={label}>{label}</a>
-          ))}
-        </div>
-        <button id="theme-toggle" class="theme-toggle" aria-label="テーマ切り替え">Theme</button>
-      </div>
-    </nav>
+    <div class="header-actions">
+      <button id="sidebar-toggle" class="header-button" type="button" aria-expanded="false" aria-controls="sidebar-nav-panel">
+        Menu
+      </button>
+      <button id="theme-toggle" class="header-button" type="button" aria-label="テーマ切り替え">
+        Theme
+      </button>
+    </div>
   </div>
 </header>
 
 <script is:inline>
-  const menuToggle = document.getElementById('menu-toggle');
-  const nav = document.getElementById('site-nav');
-
-  menuToggle?.addEventListener('click', () => {
-    const open = nav?.dataset.open === 'true';
-    if (!nav) return;
-    nav.dataset.open = String(!open);
-    menuToggle.setAttribute('aria-expanded', String(!open));
-  });
-
   const root = document.documentElement;
+  const themeToggle = document.getElementById('theme-toggle');
+
+  const updateThemeLabel = () => {
+    if (!themeToggle) return;
+    themeToggle.textContent = root.dataset.theme === 'light' ? 'Dark' : 'Light';
+  };
+
   const stored = localStorage.getItem('theme');
   if (stored === 'light' || stored === 'dark') {
     root.dataset.theme = stored;
   }
+  updateThemeLabel();
 
-  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+  themeToggle?.addEventListener('click', () => {
     const next = root.dataset.theme === 'light' ? 'dark' : 'light';
     root.dataset.theme = next;
     localStorage.setItem('theme', next);
+    updateThemeLabel();
   });
+
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  const sidebarPanel = document.getElementById('sidebar-nav-panel');
+
+  const setExpanded = (open) => {
+    sidebarToggle?.setAttribute('aria-expanded', String(open));
+    if (sidebarPanel) sidebarPanel.dataset.open = String(open);
+  };
+
+  sidebarToggle?.addEventListener('click', () => {
+    const open = sidebarPanel?.dataset.open === 'true';
+    setExpanded(!open);
+  });
+
+  if (window.matchMedia('(min-width: 960px)').matches) {
+    setExpanded(false);
+  }
 </script>
 
 <style>
   .site-header {
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: 25;
     border-bottom: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg), transparent 22%);
-    backdrop-filter: blur(11px);
+    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--bg), transparent 16%);
   }
 
-  .header-wrap {
+  .header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.8rem;
-    padding: 0.9rem 0;
+    padding: 0.85rem 0;
   }
 
-  .logo {
+  .site-title {
+    color: var(--text-strong);
     font-weight: 700;
-    color: var(--text);
     letter-spacing: 0.02em;
   }
 
-  .menu-toggle,
-  .theme-toggle {
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface-2);
-    color: var(--text);
-    padding: 0.4rem 0.7rem;
-  }
-
-  .site-nav {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    display: grid;
-    gap: 0.8rem;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-4px);
-    transition: opacity 220ms ease, transform 220ms ease;
-    padding: 0.9rem 4vw 1.1rem;
-    background: color-mix(in srgb, var(--bg-soft), transparent 3%);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .site-nav[data-open='true'] {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-  }
-
-  .nav-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.9rem;
-  }
-
-  .nav-links a {
-    color: var(--text);
-  }
-
-  .nav-tools {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.8rem;
-  }
-
-  .social {
+  .header-actions {
     display: inline-flex;
-    gap: 0.5rem;
+    gap: 0.55rem;
   }
 
-  .social a {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 999px;
+  .header-button {
     border: 1px solid var(--border);
+    border-radius: 999px;
     background: color-mix(in srgb, var(--surface-2), transparent 10%);
     color: var(--text);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.86rem;
   }
 
-  @media (min-width: 900px) {
-    .menu-toggle {
+  @media (min-width: 960px) {
+    #sidebar-toggle {
       display: none;
-    }
-
-    .site-nav {
-      position: static;
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-      border: 0;
-      background: transparent;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0;
-    }
-
-    .nav-tools {
-      justify-content: flex-end;
     }
   }
 </style>
